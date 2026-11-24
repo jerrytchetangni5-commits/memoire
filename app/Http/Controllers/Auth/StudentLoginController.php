@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\OtpCode;
 use App\Models\User;
 use App\Notifications\OtpNotification;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,17 +23,27 @@ class StudentLoginController extends Controller
     }
 
     // Étape 1 (envoi) : génère et envoie le code, puis passe à l'étape 2
-    public function requestOtp(Request $request): RedirectResponse
+    public function requestOtp(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'matricule' => ['required', 'digits:8'],
         ]);
+
+        if (! $request->hasSession()) {
+            throw ValidationException::withMessages([
+                'matricule' => ['La connexion par code nécessite une session de navigateur.'],
+            ]);
+        }
 
         $user = $this->findStudent($validated['matricule']);
         $this->sendOtp($user);
 
         // On garde le matricule en session pour l'étape suivante
         $request->session()->put('otp_matricule', $user->matricule);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Un code de connexion vous a été envoyé.']);
+        }
 
         return redirect()->route('login.otp');
     }
@@ -61,11 +72,23 @@ class StudentLoginController extends Controller
     }
 
     // Étape 2 (envoi) : vérifie le code et connecte l'étudiant
-    public function verifyOtp(Request $request): RedirectResponse
+    public function verifyOtp(Request $request): RedirectResponse|JsonResponse
     {
+        if (! $request->hasSession()) {
+            throw ValidationException::withMessages([
+                'code' => ['La connexion par code nécessite une session de navigateur.'],
+            ]);
+        }
+
         $matricule = $request->session()->get('otp_matricule');
 
         if (! $matricule) {
+            if ($request->expectsJson()) {
+                throw ValidationException::withMessages([
+                    'code' => ['Aucune demande de connexion en cours.'],
+                ]);
+            }
+
             return redirect()->route('login');
         }
 
@@ -92,6 +115,12 @@ class StudentLoginController extends Controller
         Auth::login($user);
         $request->session()->regenerate();      // protège contre la fixation de session
         $request->session()->forget('otp_matricule');
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Connexion réussie.']);
+        }
+
+        $request->session()->put('etudiant_salutation', $user->prenom);
 
         return redirect()->intended(route('home'));
     }

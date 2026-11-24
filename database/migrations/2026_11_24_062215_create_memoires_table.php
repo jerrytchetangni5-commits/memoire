@@ -21,6 +21,12 @@ return new class extends Migration
 
             $table->string('fichier', 255);
 
+            $table->decimal('similarite_score', 5, 2)->nullable();
+            $table->foreignId('memoire_similaire_id')
+                ->nullable()
+                ->constrained('memoires')
+                ->nullOnDelete();
+
             $table->enum('statut', ['soumis', 'en_verification', 'valide', 'rejete'])
                 ->default('soumis');
             $table->text('motif_rejet')->nullable();
@@ -28,7 +34,7 @@ return new class extends Migration
             $table->dateTime('date_validation')->nullable();
 
             $table->boolean('telechargement_autorise')->default(false);
-            $table->date('date_embargo')->nullable();
+            $table->dateTime('date_embargo')->nullable();
 
             $table->timestamps();
         });

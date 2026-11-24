@@ -30,15 +30,23 @@ class Memoire extends Model
         'date_validation',
         'telechargement_autorise',
         'date_embargo',
+        'similarite_score',
+        'memoire_similaire_id',
     ];
 
     protected function casts(): array
     {
         return [
             'date_validation' => 'datetime',
-            'date_embargo' => 'date',
+            'date_embargo' => 'datetime',
             'telechargement_autorise' => 'boolean',
+            'similarite_score' => 'float',
         ];
+    }
+
+    public function memoireSimilaire(): BelongsTo
+    {
+        return $this->belongsTo(Memoire::class, 'memoire_similaire_id');
     }
 
     public function scopeValides(Builder $query): Builder

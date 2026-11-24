@@ -14,7 +14,7 @@ class ValidationController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = Memoire::whereIn('statut', ['soumis', 'en_verification'])
-            ->with(['filiere', 'anneeAcademique', 'etudiant:id,nom,prenom,matricule']);
+            ->with(['filiere', 'anneeAcademique', 'etudiant:id,nom,prenom,matricule', 'memoireSimilaire:id,titre']);
 
         if ($request->user()->filiere_id) {
             $query->where('filiere_id', $request->user()->filiere_id);
@@ -27,7 +27,7 @@ class ValidationController extends Controller
     {
         $this->autoriserFiliere($request, $memoire);
 
-        return response()->json($memoire->load(['filiere', 'anneeAcademique', 'etudiant:id,nom,prenom,matricule']));
+        return response()->json($memoire->load(['filiere', 'anneeAcademique', 'etudiant:id,nom,prenom,matricule', 'memoireSimilaire:id,titre']));
     }
 
     public function marquerEnVerification(Request $request, Memoire $memoire): JsonResponse
@@ -51,6 +51,7 @@ class ValidationController extends Controller
             'statut' => 'valide',
             'valide_par' => $request->user()->id,
             'date_validation' => now(),
+            'date_embargo' => now()->addDay(), // visible 24h après la validation, jamais saisi manuellement
         ]);
 
         $memoire->etudiant->notify(new MemoireValideNotification($memoire));
