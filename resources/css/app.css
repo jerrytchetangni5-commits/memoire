@@ -1,0 +1,17 @@
+/* À AJOUTER À LA FIN de resources/css/app.css (ne remplace pas les lignes Tailwind existantes) */
+
+:root {
+    --color-primary: #1e3a5f;
+    --color-primary-hover: #16304f;
+  }
+  
+  /* Police des titres */
+  .font-heading {
+    font-family: 'EB Garamond', Georgia, serif;
+  }
+  
+  /* Anneau de focus visible pour la navigation au clavier */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }

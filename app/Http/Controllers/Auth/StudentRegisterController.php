@@ -6,13 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\EtudiantEneam;
 use App\Models\User;
 use App\Notifications\WelcomeNotification;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class StudentRegisterController extends Controller
 {
-    public function store(Request $request): JsonResponse
+    // Affiche le formulaire d'inscription
+    public function create(): View
+    {
+        return view('auth.register');
+    }
+
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'matricule' => ['required', 'digits:8'],
@@ -47,9 +54,9 @@ class StudentRegisterController extends Controller
 
         $user->notify(new WelcomeNotification());
 
-        return response()->json([
-            'message' => 'Inscription réussie.',
-            'user' => $user,
-        ], 201);
+        // Redirection vers la connexion, matricule pré-rempli + message de succès
+        return redirect()->route('login')
+            ->withInput($request->only('matricule'))
+            ->with('status', 'Inscription réussie. Vous pouvez maintenant vous connecter.');
     }
 }
