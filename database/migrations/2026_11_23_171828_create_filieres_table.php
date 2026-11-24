@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('filieres', function (Blueprint $table) {
             $table->id();
+            $table->string('code', 20)->unique();
             $table->string('nom', 150);
-            $table->string('code', 20)->nullable();
             $table->timestamps();
         });
     }

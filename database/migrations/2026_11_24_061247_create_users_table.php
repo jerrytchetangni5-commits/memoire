@@ -10,13 +10,17 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('matricule', 30)->nullable()->unique();
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->string('nom', 100);
+            $table->string('prenom', 100);
+            // 8 chiffres pour les étudiants ; vide pour responsable/admin (connexion email+mot de passe).
+            $table->string('matricule', 8)->nullable()->unique();
+            $table->string('email', 150)->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->enum('role', ['etudiant', 'responsable', 'administrateur'])->default('etudiant');
+            // Nullable : un compte étudiant n'a pas de mot de passe, authentification par OTP.
+            $table->string('password')->nullable();
+            $table->enum('role', ['etudiant', 'responsable', 'admin'])->default('etudiant');
             $table->foreignId('filiere_id')->nullable()->constrained('filieres')->nullOnDelete();
+            $table->boolean('actif')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });

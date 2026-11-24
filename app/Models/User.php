@@ -8,18 +8,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements \Illuminate\Contracts\Auth\MustVerifyEmail
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
+        'nom',
+        'prenom',
         'matricule',
-        'name',
         'email',
         'password',
         'role',
         'filiere_id',
+        'actif',
     ];
 
     protected $hidden = [
@@ -32,7 +35,13 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'actif' => 'boolean',
         ];
+    }
+
+    public function getNameAttribute(): string
+    {
+        return trim("{$this->prenom} {$this->nom}");
     }
 
     public function filiere(): BelongsTo
@@ -42,7 +51,7 @@ class User extends Authenticatable
 
     public function memoiresDeposes(): HasMany
     {
-        return $this->hasMany(Memoire::class, 'etudiant_id');
+        return $this->hasMany(Memoire::class, 'user_id');
     }
 
     public function memoiresValides(): HasMany
@@ -58,5 +67,10 @@ class User extends Authenticatable
     public function lectures(): HasMany
     {
         return $this->hasMany(Lecture::class);
+    }
+
+    public function otpCodes(): HasMany
+    {
+        return $this->hasMany(OtpCode::class);
     }
 }

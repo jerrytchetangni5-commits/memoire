@@ -17,13 +17,13 @@ class Lecture extends Model
     protected $fillable = [
         'user_id',
         'memoire_id',
-        'consulte_le',
+        'lu_le',
     ];
 
     protected function casts(): array
     {
         return [
-            'consulte_le' => 'datetime',
+            'lu_le' => 'datetime',
         ];
     }
 

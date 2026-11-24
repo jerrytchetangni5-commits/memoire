@@ -13,8 +13,8 @@ class Filiere extends Model
     protected $table = 'filieres';
 
     protected $fillable = [
-        'nom',
         'code',
+        'nom',
     ];
 
     public function users(): HasMany

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('memoire_id')->constrained('memoires')->cascadeOnDelete();
-            $table->timestamp('consulte_le')->useCurrent();
+            $table->dateTime('lu_le')->useCurrent();
         });
     }
 

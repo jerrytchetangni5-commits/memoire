@@ -13,26 +13,23 @@ return new class extends Migration
             $table->string('titre', 255);
             $table->text('resume');
             $table->string('mots_cles', 255)->nullable();
+            $table->string('encadreur', 150)->nullable();
 
+            $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
             $table->foreignId('filiere_id')->constrained('filieres')->restrictOnDelete();
             $table->foreignId('annee_academique_id')->constrained('annees_academiques')->restrictOnDelete();
-            $table->foreignId('etudiant_id')->constrained('users')->restrictOnDelete();
 
-            $table->string('fichier_path');
+            $table->string('fichier', 255);
 
             $table->enum('statut', ['soumis', 'en_verification', 'valide', 'rejete'])
                 ->default('soumis');
             $table->text('motif_rejet')->nullable();
             $table->foreignId('valide_par')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('date_validation')->nullable();
+            $table->dateTime('date_validation')->nullable();
 
-            $table->boolean('acces_restreint')->default(false);
-            $table->boolean('telechargement_autorise')->default(true);
-            $table->date('embargo_jusqua')->nullable();
+            $table->boolean('telechargement_autorise')->default(false);
+            $table->date('date_embargo')->nullable();
 
-            $table->unsignedBigInteger('nb_consultations')->default(0);
-
-            $table->softDeletes();
             $table->timestamps();
         });
     }

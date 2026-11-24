@@ -7,11 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Memoire extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $table = 'memoires';
 
@@ -19,28 +18,31 @@ class Memoire extends Model
         'titre',
         'resume',
         'mots_cles',
+        'encadreur',
+        'user_id',
         'filiere_id',
         'annee_academique_id',
-        'etudiant_id',
-        'fichier_path',
+        'fichier',
         'statut',
         'motif_rejet',
         'valide_par',
         'date_validation',
-        'acces_restreint',
         'telechargement_autorise',
-        'embargo_jusqua',
-        'nb_consultations',
+        'date_embargo',
     ];
 
     protected function casts(): array
     {
         return [
             'date_validation' => 'datetime',
-            'embargo_jusqua' => 'date',
-            'acces_restreint' => 'boolean',
+            'date_embargo' => 'date',
             'telechargement_autorise' => 'boolean',
         ];
+    }
+
+    public function etudiant(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function filiere(): BelongsTo
@@ -51,11 +53,6 @@ class Memoire extends Model
     public function anneeAcademique(): BelongsTo
     {
         return $this->belongsTo(AnneeAcademique::class, 'annee_academique_id');
-    }
-
-    public function etudiant(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'etudiant_id');
     }
 
     public function validateur(): BelongsTo
