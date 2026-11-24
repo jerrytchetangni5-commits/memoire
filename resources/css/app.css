@@ -1,3 +1,6 @@
+@import 'tailwindcss';
+@source '../views/**/*.blade.php';
+@source '../js/**/*.js';
 /* À AJOUTER À LA FIN de resources/css/app.css (ne remplace pas les lignes Tailwind existantes) */
 
 :root {
