@@ -22,7 +22,7 @@
         <x-field
             id="email"
             type="email"
-            label="E-mail institutionnel"
+            label="E-mail "
             autocomplete="email"
             required
         />

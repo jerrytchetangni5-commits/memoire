@@ -10,7 +10,13 @@ class EnsureRole
 {
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (! $request->user() || ! in_array($request->user()->role, $roles, true)) {
+        $user = $request->user();
+
+        if (! $user && $request->routeIs('admin.*')) {
+            return redirect()->route('admin.login');
+        }
+
+        if (! $user || ! $user->actif || ! in_array($user->role, $roles, true)) {
             abort(403, 'Accès réservé.');
         }
 
