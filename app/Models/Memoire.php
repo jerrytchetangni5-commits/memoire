@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -38,6 +39,14 @@ class Memoire extends Model
             'date_embargo' => 'date',
             'telechargement_autorise' => 'boolean',
         ];
+    }
+
+    public function scopeValides(Builder $query): Builder
+    {
+        return $query->where('statut', 'valide')
+            ->where(function (Builder $q) {
+                $q->whereNull('date_embargo')->orWhere('date_embargo', '<=', now());
+            });
     }
 
     public function etudiant(): BelongsTo
