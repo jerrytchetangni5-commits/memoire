@@ -21,6 +21,8 @@ class Memoire extends Model
         'mots_cles',
         'encadreur',
         'user_id',
+        'auteur_nom',
+        'auteur_prenom',
         'filiere_id',
         'annee_academique_id',
         'fichier',
@@ -60,6 +62,14 @@ class Memoire extends Model
     public function etudiant(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function getAuteurCompletAttribute(): string
+    {
+        $nom = $this->auteur_nom ?? $this->etudiant?->nom ?? '';
+        $prenom = $this->auteur_prenom ?? $this->etudiant?->prenom ?? '';
+
+        return trim("{$prenom} {$nom}");
     }
 
     public function filiere(): BelongsTo

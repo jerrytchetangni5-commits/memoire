@@ -84,6 +84,7 @@ class SimilariteServiceTest extends TestCase
             'password' => 'password',
             'role' => 'etudiant',
             'filiere_id' => $filiere->id,
+            'actif' => true,
         ]);
     }
 

@@ -10,5 +10,11 @@
         "laravel-vite-plugin": "^3.2.1",
         "tailwindcss": "^4.3.5",
         "vite": "^8.3.8"
+    },
+    "dependencies": {
+        "admin-lte": "^4.10.2",
+        "bootstrap": "^5.3.9",
+        "bootstrap-icons": "^1.13.2",
+        "chart.js": "^4.6.2"
     }
 }

@@ -99,6 +99,7 @@ class StudentViewsTest extends TestCase
             'password' => 'password',
             'role' => $role,
             'filiere_id' => $filiere->id,
+            'actif' => true,
         ]);
     }
 }

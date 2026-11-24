@@ -56,10 +56,7 @@ class StudentRegisterController extends Controller
         $user->notify(new WelcomeNotification);
 
         if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'Inscription réussie.',
-                'user' => $user,
-            ], 201);
+            return response()->json(['message' => 'Inscription réussie.'], 201);
         }
 
         // Redirection vers la connexion, matricule pré-rempli + message de succès

@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @source '../views/**/*.blade.php';
 @source '../js/**/*.js';
 
@@ -7,10 +7,12 @@
     --color-primary-hover: #16304f;
 }
 
+/* Police des titres */
 .font-heading {
-    font-family: 'EB Garamond', Georgia, serif;
+    font-family: "EB Garamond", Georgia, serif;
 }
 
+/* Anneau de focus visible pour la navigation au clavier */
 :focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
