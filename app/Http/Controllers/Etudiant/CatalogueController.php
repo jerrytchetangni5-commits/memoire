@@ -29,7 +29,12 @@ class CatalogueController extends Controller
             ->when($request->filled('annee_academique_id'), fn ($q) => $q->where('annee_academique_id', $request->integer('annee_academique_id')))
             ->when($request->filled('auteur'), function ($q) use ($request) {
                 $terme = $request->string('auteur');
-                $q->whereHas('etudiant', fn ($u) => $u->where('nom', 'like', "%{$terme}%")->orWhere('prenom', 'like', "%{$terme}%"));
+                $q->where(function ($query) use ($terme): void {
+                    $query->where('auteur_nom', 'like', "%{$terme}%")
+                        ->orWhere('auteur_prenom', 'like', "%{$terme}%")
+                        ->orWhereHas('etudiant', fn ($user) => $user->where('nom', 'like', "%{$terme}%")
+                            ->orWhere('prenom', 'like', "%{$terme}%"));
+                });
             })
             ->with(['filiere', 'anneeAcademique', 'etudiant:id,nom,prenom'])
             ->latest()

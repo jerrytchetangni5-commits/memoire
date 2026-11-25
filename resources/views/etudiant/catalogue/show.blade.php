@@ -1,7 +1,7 @@
 @extends('layouts.etudiant')
 
 @php
-    $auteur = trim(($memoire->etudiant->prenom ?? '').' '.($memoire->etudiant->nom ?? ''));
+    $auteur = $memoire->auteur_complet;
     $motsCles = collect(preg_split('/[,;]+/', (string) $memoire->mots_cles))->map(fn ($m) => trim($m))->filter()->values();
 @endphp
 

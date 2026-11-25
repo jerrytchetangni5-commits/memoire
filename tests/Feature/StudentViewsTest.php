@@ -63,6 +63,34 @@ class StudentViewsTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_catalogue_shows_and_searches_manual_authors_without_student_accounts(): void
+    {
+        $filiere = Filiere::create(['code' => 'INFO', 'nom' => 'Informatique']);
+        $annee = AnneeAcademique::create(['libelle' => '2025-2026']);
+        $student = $this->createUser('etudiant', $filiere, 'student@example.com');
+
+        $memoire = Memoire::create([
+            'titre' => 'Mémoire d’archive sans compte étudiant',
+            'resume' => 'Résumé de démonstration',
+            'auteur_nom' => 'Tchibozo',
+            'auteur_prenom' => 'Nadège',
+            'filiere_id' => $filiere->id,
+            'annee_academique_id' => $annee->id,
+            'fichier' => 'memoires/archive.pdf',
+            'statut' => 'valide',
+        ]);
+
+        $this->actingAs($student)
+            ->get('/catalogue?auteur=Nad%C3%A8ge')
+            ->assertOk()
+            ->assertSee($memoire->titre)
+            ->assertSee('Nadège Tchibozo');
+
+        $this->get("/catalogue/{$memoire->id}")
+            ->assertOk()
+            ->assertSee('Par Nadège Tchibozo');
+    }
+
     public function test_student_is_greeted_by_first_name_on_the_first_page_after_otp_login(): void
     {
         $filiere = Filiere::create(['code' => 'INFO', 'nom' => 'Informatique']);

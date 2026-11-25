@@ -1,6 +1,6 @@
 @props(['memoire', 'href'])
 @php
-    $auteur = trim(($memoire->etudiant->prenom ?? '').' '.($memoire->etudiant->nom ?? ''));
+    $auteur = $memoire->auteur_complet;
 @endphp
 <article class="relative flex h-full flex-col rounded-xl border border-slate-300 bg-white p-5 transition-colors duration-200 hover:border-slate-500 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-[color:var(--color-primary)]">
     <h2 class="font-heading text-xl font-semibold leading-snug text-slate-900">
