@@ -47,7 +47,7 @@
                 @endif
 
                 @if ($memoire->telechargement_autorise)
-                    <a href="{{ route('etudiant.memoires.telechargement', $memoire) }}" class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-slate-500 bg-white px-4 text-base font-medium text-slate-800 transition-colors duration-200 hover:bg-slate-50">
+                    <a href="{{ route('public.memoires.telechargement', $memoire) }}" class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-slate-500 bg-white px-4 text-base font-medium text-slate-800 transition-colors duration-200 hover:bg-slate-50">
                         <x-icone name="download" class="size-5" />
                         Télécharger le PDF
                     </a>
@@ -77,6 +77,12 @@
                         <dd class="mt-0.5 text-base text-slate-900">{{ $memoire->encadreur }}</dd>
                     </div>
                 @endif
+                @if ($memoire->autres_auteurs)
+                    <div>
+                        <dt class="font-medium text-slate-600">Autres auteurs</dt>
+                        <dd class="mt-0.5 text-base text-slate-900">{{ $memoire->autres_auteurs }}</dd>
+                    </div>
+                @endif
                 @if ($motsCles->isNotEmpty())
                     <div>
                         <dt class="font-medium text-slate-600">Mots-clés</dt>
@@ -100,13 +106,13 @@
             <section aria-labelledby="titre-lecture">
                 <h2 id="titre-lecture" class="sr-only">Lecture en ligne</h2>
                 <iframe
-                    src="{{ route('etudiant.memoires.lecture', $memoire) }}"
+                    src="{{ route('public.memoires.lecture', $memoire) }}"
                     title="Lecture du mémoire : {{ $memoire->titre }}"
                     class="h-[75dvh] min-h-[28rem] w-full rounded-xl border border-slate-300 bg-white"
                 ></iframe>
                 <p class="mt-3 text-sm text-slate-600">
                     Le PDF ne s’affiche pas ?
-                    <a href="{{ route('etudiant.memoires.lecture', $memoire) }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 font-medium text-[color:var(--color-primary)] underline underline-offset-2">
+                    <a href="{{ route('public.memoires.lecture', $memoire) }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 font-medium text-[color:var(--color-primary)] underline underline-offset-2">
                         Ouvrez-le dans un nouvel onglet
                         <x-icone name="external-link" class="size-4" />
                     </a>

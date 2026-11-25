@@ -1,12 +1,21 @@
 @php
+    $estConnecte = auth()->check();
+
     $liens = [
-        ['route' => 'etudiant.catalogue.index', 'actif' => ['etudiant.catalogue.*'], 'icone' => 'book-open', 'texte' => 'Catalogue'],
-        ['route' => 'etudiant.depots.index', 'actif' => ['etudiant.depots.index', 'etudiant.depots.show'], 'icone' => 'file-text', 'texte' => 'Mes dépôts'],
-        ['route' => 'etudiant.depots.create', 'actif' => ['etudiant.depots.create'], 'icone' => 'upload', 'texte' => 'Déposer un mémoire'],
-        ['route' => 'etudiant.favoris.index', 'actif' => ['etudiant.favoris.*'], 'icone' => 'heart', 'texte' => 'Favoris'],
-        ['route' => 'etudiant.historique', 'actif' => ['etudiant.historique'], 'icone' => 'history', 'texte' => 'Historique'],
+        ['route' => 'public.catalogue.index', 'actif' => ['public.catalogue.*'], 'icone' => 'book-open', 'texte' => 'Catalogue'],
     ];
+
+    if ($estConnecte) {
+        $liens = array_merge($liens, [
+            ['route' => 'etudiant.depots.index', 'actif' => ['etudiant.depots.index', 'etudiant.depots.show'], 'icone' => 'file-text', 'texte' => 'Mes dépôts'],
+            ['route' => 'etudiant.depots.create', 'actif' => ['etudiant.depots.create'], 'icone' => 'upload', 'texte' => 'Déposer un mémoire'],
+            ['route' => 'etudiant.favoris.index', 'actif' => ['etudiant.favoris.*'], 'icone' => 'heart', 'texte' => 'Favoris'],
+            ['route' => 'etudiant.historique', 'actif' => ['etudiant.historique'], 'icone' => 'history', 'texte' => 'Historique'],
+        ]);
+    }
+
     $classeLien = 'flex items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-200';
+    $classeBouton = 'flex items-center gap-2 rounded-lg bg-[color:var(--color-primary)] px-4 text-sm font-medium text-white transition-colors duration-200 hover:bg-[color:var(--color-primary-hover)]';
 @endphp
 <!DOCTYPE html>
 <html lang="fr">
@@ -28,13 +37,13 @@
 
     <header class="relative border-b border-slate-300 bg-white">
         <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
-            <a href="{{ route('etudiant.catalogue.index') }}" class="flex items-baseline gap-2 rounded-lg">
+            <a href="{{ route('public.catalogue.index') }}" class="flex items-baseline gap-2 rounded-lg">
                 <span class="text-sm font-medium tracking-wide text-slate-600">ENEAM</span>
                 <span class="font-heading text-xl font-semibold text-[color:var(--color-primary)]">Bibliothèque des mémoires</span>
             </a>
 
-            {{-- Navigation large écran --}}
-            <nav aria-label="Navigation principale" class="hidden items-center gap-1 xl:flex">
+            {{-- Navigation large écran (bascule plus tôt pour un visiteur : il a moins de liens) --}}
+            <nav aria-label="Navigation principale" class="{{ $estConnecte ? 'hidden xl:flex' : 'hidden md:flex' }} items-center gap-1">
                 @foreach ($liens as $lien)
                     @php $actif = request()->routeIs(...$lien['actif']); @endphp
                     <a
@@ -47,18 +56,31 @@
                     </a>
                 @endforeach
 
-                {{-- Action sensible séparée de la navigation --}}
-                <form method="POST" action="{{ route('logout') }}" class="ml-3 border-l border-slate-300 pl-3">
-                    @csrf
-                    <button type="submit" class="{{ $classeLien }} h-11 cursor-pointer text-slate-700 hover:bg-slate-100">
-                        <x-icone name="log-out" class="size-5" />
-                        Déconnexion
-                    </button>
-                </form>
+                @if ($estConnecte)
+                    {{-- Action sensible séparée de la navigation --}}
+                    <form method="POST" action="{{ route('logout') }}" class="ml-3 border-l border-slate-300 pl-3">
+                        @csrf
+                        <button type="submit" class="{{ $classeLien }} h-11 cursor-pointer text-slate-700 hover:bg-slate-100">
+                            <x-icone name="log-out" class="size-5" />
+                            Déconnexion
+                        </button>
+                    </form>
+                @else
+                    <div class="ml-3 flex items-center gap-2 border-l border-slate-300 pl-3">
+                        <a href="{{ route('login') }}" class="{{ $classeLien }} h-11 text-slate-700 hover:bg-slate-100">
+                            <x-icone name="log-in" class="size-5" />
+                            Se connecter
+                        </a>
+                        <a href="{{ route('register') }}" class="{{ $classeBouton }} h-11">
+                            <x-icone name="user-plus" class="size-5" />
+                            S’inscrire
+                        </a>
+                    </div>
+                @endif
             </nav>
 
-            {{-- Menu replié sur mobile et tablette (sans JavaScript : <details>) --}}
-            <details id="menu-mobile" class="group xl:hidden">
+            {{-- Menu replié sur petits écrans (sans JavaScript : <details>) --}}
+            <details id="menu-mobile" class="group {{ $estConnecte ? 'xl:hidden' : 'md:hidden' }}">
                 <summary class="flex h-11 cursor-pointer list-none items-center gap-2 rounded-lg border border-slate-500 px-3 text-sm font-medium text-slate-800 [&::-webkit-details-marker]:hidden">
                     <x-icone name="menu" class="size-5 group-open:hidden" />
                     <x-icone name="x" class="hidden size-5 group-open:block" />
@@ -79,13 +101,26 @@
                             </a>
                         @endforeach
 
-                        <form method="POST" action="{{ route('logout') }}" class="mt-2 border-t border-slate-300 pt-2">
-                            @csrf
-                            <button type="submit" class="{{ $classeLien }} h-12 w-full cursor-pointer text-slate-700 hover:bg-slate-100">
-                                <x-icone name="log-out" class="size-5" />
-                                Déconnexion
-                            </button>
-                        </form>
+                        @if ($estConnecte)
+                            <form method="POST" action="{{ route('logout') }}" class="mt-2 border-t border-slate-300 pt-2">
+                                @csrf
+                                <button type="submit" class="{{ $classeLien }} h-12 w-full cursor-pointer text-slate-700 hover:bg-slate-100">
+                                    <x-icone name="log-out" class="size-5" />
+                                    Déconnexion
+                                </button>
+                            </form>
+                        @else
+                            <div class="mt-2 space-y-1 border-t border-slate-300 pt-2">
+                                <a href="{{ route('login') }}" class="{{ $classeLien }} h-12 text-slate-700 hover:bg-slate-100">
+                                    <x-icone name="log-in" class="size-5" />
+                                    Se connecter
+                                </a>
+                                <a href="{{ route('register') }}" class="{{ $classeBouton }} h-12 justify-center">
+                                    <x-icone name="user-plus" class="size-5" />
+                                    S’inscrire
+                                </a>
+                            </div>
+                        @endif
                     </nav>
                 </div>
             </details>
@@ -93,6 +128,9 @@
     </header>
 
     <main id="contenu" tabindex="-1" class="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:py-10">
+        @if (session()->has('etudiant_salutation'))
+            <p class="mb-6 text-lg font-medium text-slate-700">Salut, {{ session()->pull('etudiant_salutation') }} !</p>
+        @endif
         @if (session('status'))
             <div class="mb-6">
                 <x-alert type="success">{{ session('status') }}</x-alert>
@@ -104,11 +142,6 @@
                 <x-icone name="triangle-alert" class="mt-0.5 size-5" />
                 <p>{{ session('avertissement') }}</p>
             </div>
-        @endif
-
-        @php($prenomBienvenue = session()->pull('etudiant_salutation'))
-        @if ($prenomBienvenue)
-            <p role="status" class="mb-4 text-lg font-medium text-slate-800">Salut, {{ $prenomBienvenue }} !</p>
         @endif
 
         <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">

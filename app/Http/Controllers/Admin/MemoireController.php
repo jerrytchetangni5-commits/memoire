@@ -38,6 +38,7 @@ class MemoireController extends Controller
             'resume' => ['required', 'string'],
             'mots_cles' => ['nullable', 'string', 'max:255'],
             'encadreur' => ['nullable', 'string', 'max:150'],
+            'autres_auteurs' => ['nullable', 'string', 'max:255'],
             'user_id' => [
                 'nullable',
                 'integer',

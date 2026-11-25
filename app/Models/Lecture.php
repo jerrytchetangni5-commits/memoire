@@ -17,6 +17,7 @@ class Lecture extends Model
     protected $fillable = [
         'user_id',
         'memoire_id',
+        'paiement_id',
         'lu_le',
     ];
 
@@ -35,5 +36,10 @@ class Lecture extends Model
     public function memoire(): BelongsTo
     {
         return $this->belongsTo(Memoire::class);
+    }
+
+    public function paiement(): BelongsTo
+    {
+        return $this->belongsTo(Paiement::class);
     }
 }

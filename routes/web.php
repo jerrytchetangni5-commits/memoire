@@ -9,10 +9,12 @@ use App\Http\Controllers\Admin\UtilisateurController;
 use App\Http\Controllers\Admin\ValidationController as AdminValidationController;
 use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\Auth\StudentRegisterController;
-use App\Http\Controllers\Etudiant\CatalogueController;
 use App\Http\Controllers\Etudiant\DepotController;
 use App\Http\Controllers\Etudiant\FavoriController;
-use App\Http\Controllers\Etudiant\LectureController;
+use App\Http\Controllers\Etudiant\HistoriqueController;
+use App\Http\Controllers\Publique\CatalogueController;
+use App\Http\Controllers\Publique\LectureController;
+use App\Http\Controllers\Publique\PaiementController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -57,12 +59,27 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->name('logout');
 });
 
+// Accueil : catalogue public ; les étudiants connectés conservent l'accès à leur ancien espace.
+Route::get('/', function (\Illuminate\Http\Request $request) {
+    if ($request->user()?->role === 'etudiant') {
+        return redirect()->route('etudiant.catalogue.index');
+    }
+
+    return redirect()->route('public.catalogue.index');
+})->name('home');
+
+Route::get('/espace-etudiant/catalogue', [CatalogueController::class, 'index'])
+    ->name('etudiant.catalogue.index');
+Route::get('/espace-etudiant/catalogue/{memoire}', [CatalogueController::class, 'show'])
+    ->name('etudiant.catalogue.show');
+
 // Pages réservées aux visiteurs non connectés
 Route::middleware('guest')->group(function () {
     Route::get('/inscription', [StudentRegisterController::class, 'create'])->name('register');
     Route::post('/inscription', [StudentRegisterController::class, 'store'])
         ->middleware('throttle:10,1')->name('register.store');
 
+    // Le nom "login" est obligatoire : Laravel y renvoie les visiteurs non connectés
     Route::get('/connexion', [StudentLoginController::class, 'create'])->name('login');
     Route::post('/connexion', [StudentLoginController::class, 'requestOtp'])
         ->middleware('throttle:5,1')->name('login.otp.request');
@@ -74,33 +91,45 @@ Route::middleware('guest')->group(function () {
         ->middleware('throttle:3,1')->name('login.otp.resend');
 });
 
+// Pages OUVERTES À TOUS (pas de middleware "auth").
+// Le catalogue et les métadonnées sont publics ; l'accès au PDF est décidé dans les contrôleurs :
+//   - connecté : règle historique (public / propriétaire / staff, case « téléchargement autorisé ») ;
+//   - externe : jeton délivré après un paiement Kkiapay vérifié côté serveur.
+// Noms préfixés "public." : routes/api.php définit déjà catalogue.index, catalogue.show, etc.
+Route::name('public.')->group(function () {
+    Route::get('/catalogue', [CatalogueController::class, 'index'])->name('catalogue.index');
+    Route::get('/catalogue/{memoire}', [CatalogueController::class, 'show'])->name('catalogue.show');
+
+    Route::post('/catalogue/{memoire}/paiement', [PaiementController::class, 'store'])
+        ->middleware('throttle:10,1')->name('paiement.store');
+    Route::post('/catalogue/{memoire}/acces', [PaiementController::class, 'acces'])
+        ->middleware('throttle:10,1')->name('acces.store');
+
+    Route::get('/memoires/{memoire}/lecture', [LectureController::class, 'lire'])->name('memoires.lecture');
+    Route::get('/memoires/{memoire}/telechargement', [LectureController::class, 'telecharger'])
+        ->name('memoires.telechargement');
+});
+
+// Pages réservées aux utilisateurs connectés (guard "web" : session, établie par Auth::login() après le code OTP)
 Route::middleware('auth')->group(function () {
     Route::post('/deconnexion', [StudentLoginController::class, 'logout'])->name('logout');
 
-    Route::get('/memoires/{memoire}/lecture', [LectureController::class, 'lire'])
-        ->name('etudiant.memoires.lecture');
-    Route::get('/memoires/{memoire}/telechargement', [LectureController::class, 'telecharger'])
-        ->name('etudiant.memoires.telechargement');
+    // Espace étudiant (noms préfixés "etudiant.", pour ne pas heurter ceux de routes/api.php)
+    Route::middleware('role:etudiant')->name('etudiant.')->group(function () {
+        // Mes dépôts : liste, formulaire, enregistrement, détail
+        Route::get('/mes-depots', [DepotController::class, 'index'])->name('depots.index');
+        Route::get('/mes-depots/nouveau', [DepotController::class, 'create'])->name('depots.create');
+        Route::post('/mes-depots', [DepotController::class, 'store'])
+            ->middleware('throttle:10,1')->name('depots.store');
+        Route::get('/mes-depots/{memoire}', [DepotController::class, 'show'])->name('depots.show');
 
-    Route::middleware('role:etudiant')->group(function () {
-        Route::get('/', fn () => redirect()->route('etudiant.catalogue.index'))->name('home');
+        // Favoris
+        Route::get('/favoris', [FavoriController::class, 'index'])->name('favoris.index');
+        Route::post('/favoris', [FavoriController::class, 'store'])->name('favoris.store');
+        Route::delete('/favoris/{memoire}', [FavoriController::class, 'destroy'])->name('favoris.destroy');
 
-        Route::name('etudiant.')->group(function () {
-            Route::get('/catalogue', [CatalogueController::class, 'index'])->name('catalogue.index');
-            Route::get('/catalogue/{memoire}', [CatalogueController::class, 'show'])->name('catalogue.show');
-
-            Route::get('/mes-depots', [DepotController::class, 'index'])->name('depots.index');
-            Route::get('/mes-depots/nouveau', [DepotController::class, 'create'])->name('depots.create');
-            Route::post('/mes-depots', [DepotController::class, 'store'])
-                ->middleware('throttle:10,1')->name('depots.store');
-            Route::get('/mes-depots/{memoire}', [DepotController::class, 'show'])->name('depots.show');
-
-            Route::get('/favoris', [FavoriController::class, 'index'])->name('favoris.index');
-            Route::post('/favoris', [FavoriController::class, 'store'])->name('favoris.store');
-            Route::delete('/favoris/{memoire}', [FavoriController::class, 'destroy'])->name('favoris.destroy');
-
-            Route::get('/historique', [LectureController::class, 'historique'])->name('historique');
-        });
+        // Historique de lecture
+        Route::get('/historique', [HistoriqueController::class, 'index'])->name('historique');
     });
 });
 

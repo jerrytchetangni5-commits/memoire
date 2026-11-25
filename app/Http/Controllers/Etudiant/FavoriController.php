@@ -16,7 +16,9 @@ class FavoriController extends Controller
     {
         $favoris = Favori::where('user_id', $request->user()->id)
             ->whereHas('memoire', fn ($query) => $query->valides())
-            ->with(['memoire.filiere', 'memoire.anneeAcademique', 'memoire.etudiant:id,nom,prenom'])
+            ->with(['memoire' => fn ($q) => $q
+                ->withCount('lectures')
+                ->with(['filiere', 'anneeAcademique', 'etudiant:id,nom,prenom'])])
             ->latest()
             ->paginate(12)
             ->withQueryString();

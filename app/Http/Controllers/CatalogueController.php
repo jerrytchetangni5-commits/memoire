@@ -21,6 +21,7 @@ class CatalogueController extends Controller
                 $q->where(function ($query) use ($terme): void {
                     $query->where('auteur_nom', 'like', "%{$terme}%")
                         ->orWhere('auteur_prenom', 'like', "%{$terme}%")
+                        ->orWhere('autres_auteurs', 'like', "%{$terme}%")
                         ->orWhereHas('etudiant', fn ($user) => $user->where('nom', 'like', "%{$terme}%")
                             ->orWhere('prenom', 'like', "%{$terme}%"));
                 });

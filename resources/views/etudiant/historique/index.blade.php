@@ -11,7 +11,7 @@
             <p class="mx-auto mt-2 max-w-prose text-slate-600">
                 Les mémoires que vous ouvrez depuis le catalogue apparaîtront ici.
             </p>
-            <a href="{{ route('etudiant.catalogue.index') }}" class="mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[color:var(--color-primary)] px-5 text-base font-medium text-white transition-colors duration-200 hover:bg-[color:var(--color-primary-hover)]">
+            <a href="{{ route('public.catalogue.index') }}" class="mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[color:var(--color-primary)] px-5 text-base font-medium text-white transition-colors duration-200 hover:bg-[color:var(--color-primary-hover)]">
                 <x-icone name="book-open" class="size-5" />
                 Parcourir le catalogue
             </a>
@@ -22,7 +22,7 @@
                 @php $luLe = \Illuminate\Support\Carbon::parse($lecture->lu_le); @endphp
                 <li class="flex flex-col gap-1 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                     @if ($lecture->memoire)
-                        <a href="{{ route('etudiant.catalogue.show', $lecture->memoire) }}" class="inline-flex min-h-11 items-center font-medium text-slate-900 underline-offset-2 hover:underline">
+                        <a href="{{ route('public.catalogue.show', $lecture->memoire) }}" class="inline-flex min-h-11 items-center font-medium text-slate-900 underline-offset-2 hover:underline">
                             {{ $lecture->memoire->titre }}
                         </a>
                     @else

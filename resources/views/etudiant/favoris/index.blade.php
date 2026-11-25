@@ -11,7 +11,7 @@
             <p class="mx-auto mt-2 max-w-prose text-slate-600">
                 Depuis la page d’un mémoire, utilisez « Ajouter aux favoris » pour le retrouver ici.
             </p>
-            <a href="{{ route('etudiant.catalogue.index') }}" class="mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[color:var(--color-primary)] px-5 text-base font-medium text-white transition-colors duration-200 hover:bg-[color:var(--color-primary-hover)]">
+            <a href="{{ route('public.catalogue.index') }}" class="mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[color:var(--color-primary)] px-5 text-base font-medium text-white transition-colors duration-200 hover:bg-[color:var(--color-primary-hover)]">
                 <x-icone name="book-open" class="size-5" />
                 Parcourir le catalogue
             </a>
@@ -19,7 +19,7 @@
     @else
         <div class="grid gap-4 lg:grid-cols-2">
             @foreach ($favoris as $favori)
-                <x-memoire-carte :memoire="$favori->memoire" :href="route('etudiant.catalogue.show', $favori->memoire)">
+                <x-memoire-carte :memoire="$favori->memoire" :href="route('public.catalogue.show', $favori->memoire)">
                     <form method="POST" action="{{ route('etudiant.favoris.destroy', $favori->memoire) }}">
                         @csrf
                         @method('DELETE')

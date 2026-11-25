@@ -1,6 +1,9 @@
 @props(['memoire', 'href'])
 @php
-    $auteur = $memoire->auteur_complet;
+    $principal = trim(($memoire->auteur_prenom ?: $memoire->etudiant->prenom ?? '').' '.($memoire->auteur_nom ?: $memoire->etudiant->nom ?? ''));
+    $autres = trim((string) $memoire->autres_auteurs, " ,;");
+    $auteurs = $principal.($autres !== '' ? ($principal !== '' ? ', ' : '').$autres : '');
+    $nbLectures = array_key_exists('lectures_count', $memoire->getAttributes()) ? (int) $memoire->lectures_count : null;
 @endphp
 <article class="relative flex h-full flex-col rounded-xl border border-slate-300 bg-white p-5 transition-colors duration-200 hover:border-slate-500 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-[color:var(--color-primary)]">
     <h2 class="font-heading text-xl font-semibold leading-snug text-slate-900">
@@ -8,8 +11,8 @@
         <a href="{{ $href }}" class="underline-offset-2 hover:underline focus-visible:outline-none after:absolute after:inset-0 after:content-['']">{{ $memoire->titre }}</a>
     </h2>
 
-    @if ($auteur !== '')
-        <p class="mt-1 text-sm text-slate-600">{{ $auteur }}</p>
+    @if ($auteurs !== '')
+        <p class="mt-1 text-sm text-slate-600">{{ $auteurs }}</p>
     @endif
 
     <p class="mt-3 leading-relaxed text-slate-700">{{ Str::limit($memoire->resume, 220) }}</p>
@@ -20,6 +23,12 @@
         @endif
         @if ($memoire->anneeAcademique)
             <li class="rounded-md border border-slate-300 bg-slate-50 px-2 py-1">{{ $memoire->anneeAcademique->libelle }}</li>
+        @endif
+        @if (! is_null($nbLectures))
+            <li class="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-slate-50 px-2 py-1">
+                <x-icone name="eye" class="size-4" />
+                {{ $nbLectures }} {{ $nbLectures > 1 ? 'lectures' : 'lecture' }}
+            </li>
         @endif
     </ul>
 

@@ -2,7 +2,7 @@
 
 @section('title', 'Catalogue')
 @section('heading', 'Catalogue des mémoires')
-@section('subtitle', 'Consultez les mémoires validés par la bibliothèque de l’ENEAM.')
+@section('subtitle', 'Consultez les mémoires validés par la bibliothèque de l’ENEAM, classés du plus lu au moins lu.')
 
 @section('content')
     @php
@@ -10,7 +10,7 @@
         $libelle = 'mb-1 block text-sm font-medium text-slate-800';
     @endphp
 
-    <form method="GET" action="{{ route('etudiant.catalogue.index') }}" role="search" class="rounded-xl border border-slate-300 bg-white p-4 sm:p-6">
+    <form method="GET" action="{{ route('public.catalogue.index') }}" role="search" class="rounded-xl border border-slate-300 bg-white p-4 sm:p-6">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div class="flex-1">
                 <label for="titre" class="{{ $libelle }}">Titre du mémoire</label>
@@ -66,7 +66,7 @@
             {{ $memoires->total() }} {{ $memoires->total() > 1 ? 'mémoires trouvés' : 'mémoire trouvé' }}
         </p>
         @if ($filtresActifs)
-            <a href="{{ route('etudiant.catalogue.index') }}" class="inline-flex min-h-11 items-center text-sm font-medium text-[color:var(--color-primary)] underline underline-offset-2">
+            <a href="{{ route('public.catalogue.index') }}" class="inline-flex min-h-11 items-center text-sm font-medium text-[color:var(--color-primary)] underline underline-offset-2">
                 Réinitialiser la recherche
             </a>
         @endif
@@ -82,7 +82,7 @@
     @else
         <div class="grid gap-4 lg:grid-cols-2">
             @foreach ($memoires as $memoire)
-                <x-memoire-carte :memoire="$memoire" :href="route('etudiant.catalogue.show', $memoire)" />
+                <x-memoire-carte :memoire="$memoire" :href="route('public.catalogue.show', $memoire)" />
             @endforeach
         </div>
 

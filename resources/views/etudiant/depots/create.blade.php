@@ -66,6 +66,13 @@
 
             <x-field id="encadreur" label="Encadreur (facultatif)" maxlength="150" />
 
+            <x-field
+                id="autres_auteurs"
+                label="Autres auteurs (facultatif)"
+                hint="Noms des co-auteurs, séparés par des virgules. Ils sont saisis à la main : seul le déposant voit ce dépôt dans « Mes dépôts »."
+                maxlength="255"
+            />
+
             {{-- Filière : imposée par le compte, affichée en lecture seule --}}
             <div>
                 <label for="filiere_nom" class="{{ $libelle }}">Filière</label>

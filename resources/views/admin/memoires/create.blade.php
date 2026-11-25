@@ -284,6 +284,23 @@
                             @enderror
                         </div>
                     </div>
+                    <div class="archive-field">
+                        <label class="archive-label" for="autres_auteurs">
+                            Autres auteurs <span class="archive-optional">Facultatif</span>
+                        </label>
+                        <input
+                            class="form-control archive-control @error('autres_auteurs') is-invalid @enderror"
+                            id="autres_auteurs"
+                            name="autres_auteurs"
+                            type="text"
+                            maxlength="255"
+                            value="{{ old('autres_auteurs') }}"
+                            placeholder="Ex. KOFFI Jean, DOSSA Marie"
+                        >
+                        @error('autres_auteurs')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="archive-form-section archive-document-section">

@@ -20,6 +20,7 @@ class Memoire extends Model
         'resume',
         'mots_cles',
         'encadreur',
+        'autres_auteurs',
         'user_id',
         'auteur_nom',
         'auteur_prenom',
@@ -100,5 +101,10 @@ class Memoire extends Model
     public function lectures(): HasMany
     {
         return $this->hasMany(Lecture::class);
+    }
+
+    public function paiements(): HasMany
+    {
+        return $this->hasMany(Paiement::class);
     }
 }

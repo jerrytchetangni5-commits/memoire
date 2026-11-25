@@ -56,6 +56,7 @@ class DepotController extends Controller
             'resume' => ['required', 'string'],
             'mots_cles' => ['nullable', 'string', 'max:255'],
             'encadreur' => ['nullable', 'string', 'max:150'],
+            'autres_auteurs' => ['nullable', 'string', 'max:255'],
             'filiere_id' => ['required', 'integer', Rule::in([$user->filiere_id])],
             'annee_academique_id' => ['required', 'exists:annees_academiques,id'],
             'fichier' => ['required', 'file', 'mimes:pdf', 'max:20480'], // 20 Mo
