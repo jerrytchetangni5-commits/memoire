@@ -1,142 +1,117 @@
+@php
+    $liens = [
+        ['route' => 'admin.dashboard', 'actif' => ['admin.dashboard'], 'icone' => 'speedometer2', 'texte' => 'Dashboard'],
+        ['route' => 'admin.filieres.index', 'actif' => ['admin.filieres.*'], 'icone' => 'diagram-3', 'texte' => 'Filières'],
+        ['route' => 'admin.annees-academiques.index', 'actif' => ['admin.annees-academiques.*'], 'icone' => 'calendar3', 'texte' => 'Années'],
+        ['route' => 'admin.validations.index', 'actif' => ['admin.validations.*'], 'icone' => 'clipboard-check', 'texte' => 'Validations'],
+    ];
+
+    if (Auth::user()->role === 'admin') {
+        $liens[] = ['route' => 'admin.memoires.create', 'actif' => ['admin.memoires.*'], 'icone' => 'cloud-upload', 'texte' => 'Archives'];
+        $liens[] = ['route' => 'admin.utilisateurs.index', 'actif' => ['admin.utilisateurs.*'], 'icone' => 'people', 'texte' => 'Comptes'];
+    }
+@endphp
 <!doctype html>
 <html lang="fr">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Administration') · Bibliothèque des mémoires ENEAM</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600&display=swap" rel="stylesheet">
+
     @vite(['resources/css/admin.css', 'resources/js/admin.js'])
 </head>
-<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
-    <div class="app-wrapper">
-        <nav class="app-header navbar navbar-expand bg-body">
-            <div class="container-fluid">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button" aria-label="Afficher ou masquer le menu">
-                            <i class="bi bi-list"></i>
+<body class="admin-shell">
+    <a href="#contenu" class="admin-skip-link">Aller au contenu</a>
+
+    <header class="admin-site-header">
+        <div class="admin-site-header-inner">
+            <a class="admin-brand" href="{{ route('admin.dashboard') }}">
+                <span class="admin-brand-mark">ENEAM</span>
+                <span class="admin-brand-name">Bibliothèque des mémoires</span>
+            </a>
+
+            <nav aria-label="Navigation principale" class="admin-desktop-nav">
+                @foreach ($liens as $lien)
+                    @php($actif = request()->routeIs(...$lien['actif']))
+                    <a
+                        class="admin-nav-link {{ $actif ? 'is-active' : '' }}"
+                        href="{{ route($lien['route']) }}"
+                        @if ($actif) aria-current="page" @endif
+                    >
+                        <i class="bi bi-{{ $lien['icone'] }}" aria-hidden="true"></i>
+                        {{ $lien['texte'] }}
+                    </a>
+                @endforeach
+
+                <span class="admin-current-user">{{ Auth::user()->name }}</span>
+                <form method="POST" action="{{ route('admin.logout') }}" class="admin-logout-form">
+                    @csrf
+                    <button class="admin-nav-link admin-logout-button" type="submit">
+                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                        Déconnexion
+                    </button>
+                </form>
+            </nav>
+
+            <details class="admin-mobile-menu">
+                <summary>
+                    <i class="bi bi-list" aria-hidden="true"></i>
+                    Menu
+                </summary>
+                <nav aria-label="Navigation mobile" class="admin-mobile-nav">
+                    @foreach ($liens as $lien)
+                        @php($actif = request()->routeIs(...$lien['actif']))
+                        <a
+                            class="admin-nav-link {{ $actif ? 'is-active' : '' }}"
+                            href="{{ route($lien['route']) }}"
+                            @if ($actif) aria-current="page" @endif
+                        >
+                            <i class="bi bi-{{ $lien['icone'] }}" aria-hidden="true"></i>
+                            {{ $lien['texte'] }}
                         </a>
-                    </li>
-                </ul>
+                    @endforeach
 
-                <div class="ms-auto d-flex align-items-center gap-3">
-                    <span class="text-body-secondary">{{ Auth::user()->name }}</span>
-                    <form method="POST" action="{{ route('admin.logout') }}">
+                    <span class="admin-current-user">{{ Auth::user()->name }}</span>
+                    <form method="POST" action="{{ route('admin.logout') }}" class="admin-logout-form">
                         @csrf
-                        <button class="btn btn-outline-secondary btn-sm" type="submit">Déconnexion</button>
+                        <button class="admin-nav-link admin-logout-button" type="submit">
+                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                            Déconnexion
+                        </button>
                     </form>
-                </div>
-            </div>
-        </nav>
-
-        <aside class="app-sidebar bg-dark shadow" data-bs-theme="dark">
-            <div class="sidebar-brand">
-                <a class="brand-link" href="{{ route('admin.dashboard') }}">
-                    <span class="brand-text fw-light">ENEAM · Mémoires</span>
-                </a>
-            </div>
-
-            <div class="sidebar-wrapper">
-                <nav class="mt-2" aria-label="Navigation principale">
-                    <ul class="nav sidebar-menu flex-column" role="menu" data-lte-toggle="treeview" data-accordion="false">
-                        <li class="nav-item">
-                            <a
-                                class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
-                                href="{{ route('admin.dashboard') }}"
-                                @if (request()->routeIs('admin.dashboard')) aria-current="page" @endif
-                            >
-                                <i class="nav-icon bi bi-speedometer2"></i>
-                                <p>Dashboard</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a
-                                class="nav-link {{ request()->routeIs('admin.filieres.*') ? 'active' : '' }}"
-                                href="{{ route('admin.filieres.index') }}"
-                                @if (request()->routeIs('admin.filieres.*')) aria-current="page" @endif
-                            >
-                                <i class="nav-icon bi bi-diagram-3"></i>
-                                <p>Filières</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a
-                                class="nav-link {{ request()->routeIs('admin.annees-academiques.*') ? 'active' : '' }}"
-                                href="{{ route('admin.annees-academiques.index') }}"
-                                @if (request()->routeIs('admin.annees-academiques.*')) aria-current="page" @endif
-                            >
-                                <i class="nav-icon bi bi-calendar3"></i>
-                                <p>Années académiques</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a
-                                class="nav-link {{ request()->routeIs('admin.validations.*') ? 'active' : '' }}"
-                                href="{{ route('admin.validations.index') }}"
-                                @if (request()->routeIs('admin.validations.*')) aria-current="page" @endif
-                            >
-                                <i class="nav-icon bi bi-clipboard-check"></i>
-                                <p>Validations</p>
-                            </a>
-                        </li>
-                        @if (Auth::user()->role === 'admin')
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link {{ request()->routeIs('admin.memoires.*') ? 'active' : '' }}"
-                                    href="{{ route('admin.memoires.create') }}"
-                                    @if (request()->routeIs('admin.memoires.*')) aria-current="page" @endif
-                                >
-                                    <i class="nav-icon bi bi-cloud-upload"></i>
-                                    <p>Dépôt admin</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link {{ request()->routeIs('admin.utilisateurs.*') ? 'active' : '' }}"
-                                    href="{{ route('admin.utilisateurs.index') }}"
-                                    @if (request()->routeIs('admin.utilisateurs.*')) aria-current="page" @endif
-                                >
-                                    <i class="nav-icon bi bi-people"></i>
-                                    <p>Utilisateurs</p>
-                                </a>
-                            </li>
-                        @endif
-                    </ul>
                 </nav>
+            </details>
+        </div>
+    </header>
+
+    <main id="contenu" tabindex="-1" class="admin-main">
+        @if (session('status'))
+            <div class="alert alert-success alert-dismissible" role="status">
+                {{ session('status') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
             </div>
-        </aside>
+        @endif
 
-        <main class="app-main">
-            <div class="app-content-header">
-                <div class="container-fluid">
-                    <h1 class="h3 mb-0">@yield('heading', 'Dashboard admin')</h1>
-                </div>
-            </div>
+        @foreach (['delete', 'user_action', 'statut'] as $errorKey)
+            @error($errorKey)
+                <div class="alert alert-danger" role="alert">{{ $message }}</div>
+            @enderror
+        @endforeach
 
-            <div class="app-content">
-                <div class="container-fluid">
-                    @if (session('status'))
-                        <div class="alert alert-success alert-dismissible" role="status">
-                            {{ session('status') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-                        </div>
-                    @endif
+        <div class="admin-main-heading">
+            <h1>@yield('heading', 'Dashboard admin')</h1>
+        </div>
 
-                    @error('delete')
-                        <div class="alert alert-danger" role="alert">{{ $message }}</div>
-                    @enderror
+        @yield('content')
+    </main>
 
-                    @error('user_action')
-                        <div class="alert alert-danger" role="alert">{{ $message }}</div>
-                    @enderror
-
-                    @yield('content')
-                </div>
-            </div>
-        </main>
-
-        <footer class="app-footer">
-            <strong>ENEAM · Bibliothèque des mémoires</strong>
-        </footer>
-    </div>
+    <footer class="admin-site-footer">
+        ENEAM · Bibliothèque des mémoires
+    </footer>
+    @stack('scripts')
 </body>
 </html>

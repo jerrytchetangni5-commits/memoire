@@ -32,6 +32,9 @@ class AdminDashboardTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.dashboard'))
             ->assertOk()
+            ->assertSeeText('Déconnexion')
+            ->assertSee(route('admin.memoires.create'))
+            ->assertSee(route('admin.utilisateurs.index'))
             ->assertViewHas('stats', fn (array $stats): bool => $stats === [
                 'total' => 4,
                 'a_traiter' => 2,
@@ -43,6 +46,19 @@ class AdminDashboardTest extends TestCase
                 'labels' => ['Gestion', 'Informatique'],
                 'values' => [2, 2],
             ]);
+    }
+
+    public function test_responsable_navigation_does_not_show_admin_only_pages(): void
+    {
+        $responsable = User::factory()->create(['role' => 'responsable']);
+
+        $this->actingAs($responsable)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSeeText('Filières')
+            ->assertSeeText('Validations')
+            ->assertDontSee(route('admin.memoires.create'))
+            ->assertDontSee(route('admin.utilisateurs.index'));
     }
 
     public function test_admin_dashboard_handles_an_empty_catalogue(): void

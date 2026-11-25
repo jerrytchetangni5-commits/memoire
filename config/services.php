@@ -28,6 +28,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'kkiapay' => [
+        'public_key' => env('KKIAPAY_PUBLIC_KEY'),
+        'private_key' => env('KKIAPAY_PRIVATE_KEY'),
+        'secret' => env('KKIAPAY_SECRET'),
+        'sandbox' => env('KKIAPAY_SANDBOX', true),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

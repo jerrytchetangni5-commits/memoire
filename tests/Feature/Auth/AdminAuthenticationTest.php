@@ -28,7 +28,7 @@ class AdminAuthenticationTest extends TestCase
         $this->get('/admin')
             ->assertOk()
             ->assertSeeText('Dashboard admin')
-            ->assertSeeText('ENEAM · Mémoires')
+            ->assertSeeText('Bibliothèque des mémoires')
             ->assertSee('admin/deconnexion');
     }
 

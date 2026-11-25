@@ -47,7 +47,7 @@ class EtudiantsEneamSeeder extends Seeder
 
         foreach ($etudiants as $i => $data) {
             $email = $i === 0
-                ? 'balidox654@anonmart.com'
+                ? 'ligopa1596@afronewz.com'
                 : Str::slug($data['prenom']).'.'.Str::slug($data['nom']).'@eneam.bj';
 
             EtudiantEneam::updateOrCreate(
